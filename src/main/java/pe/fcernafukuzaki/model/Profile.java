@@ -61,7 +61,7 @@ public class Profile implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Profile [uid_profile=" + uid_profile + ", name=" + name + ", uid_user=" + user.getUid() + "]";
+		return "Profile [uid_profile=" + uid_profile + ", name=" + name + ", uid_user=" + (user != null ? user.getUid() : -1)+ "]";
 	}
 
 	@Override

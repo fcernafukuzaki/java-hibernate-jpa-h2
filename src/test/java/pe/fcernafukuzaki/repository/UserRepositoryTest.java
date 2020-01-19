@@ -5,20 +5,30 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import pe.fcernafukuzaki.AppConfig;
 import pe.fcernafukuzaki.model.Profile;
 import pe.fcernafukuzaki.model.User;
 import pe.fcernafukuzaki.model.UserCredential;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = AppConfig.class)
 @TestMethodOrder(OrderAnnotation.class)
 class UserRepositoryTest {
 
-	private static UserRepository userRepository = new UserRepository();
+	@Autowired
+	private UserRepository userRepository;
 
 	@Test
 	@Order(1)
@@ -28,6 +38,7 @@ class UserRepositoryTest {
 	}
 
 	@Test
+	@Disabled
 	@Order(2)
 	void whenInsertAUser() {
 		User user = new User(1L, "Francisco Cerna Fukuzaki", true, LocalDate.of(2020, 1, 7));
@@ -42,6 +53,7 @@ class UserRepositoryTest {
 	}
 
 	@Test
+	@Disabled
 	@Order(3)
 	void whenInsertUserWithCredential() {
 		User user = new User(2L, "Francisco Cerna Fukuzaki", true, LocalDate.of(2020, 1, 7));
@@ -56,6 +68,7 @@ class UserRepositoryTest {
 	}
 
 	@Test
+	@Disabled
 	@Order(4)
 	void whenInsertUserWithCredentialAndProfile() {
 		User user = new User(3L, "Francisco Cerna Fukuzaki", true, LocalDate.of(2020, 1, 7));
@@ -78,6 +91,7 @@ class UserRepositoryTest {
 	}
 
 	@Test
+	@Disabled
 	@Order(5)
 	void whenFindProfilesByUserId() {
 		List<Profile> profiles = userRepository.findProfilesByUserId(3L);
@@ -86,6 +100,7 @@ class UserRepositoryTest {
 	}
 
 	@Test
+	@Disabled
 	@Order(6)
 	void whenNotFindProfilesByUserId() {
 		List<Profile> profiles = userRepository.findProfilesByUserId(0L);
@@ -94,6 +109,7 @@ class UserRepositoryTest {
 	}
 	
 	@Test
+	@Disabled
 	@Order(7)
 	void whenAssingProfile() {
 		Long uid_user = 1L;
@@ -109,6 +125,7 @@ class UserRepositoryTest {
 	}
 	
 	@Test
+	@Disabled
 	@Order(8)
 	void whenRemoveProfile() {
 		Long uid_user = 1L;
@@ -120,9 +137,46 @@ class UserRepositoryTest {
 		
 		assertTrue(profiles.size() == 0);
 	}
+	
+	@Test
+	@Disabled
+	@Order(9)
+	void whenInsertMultipleUserWithProfile() {
+		try {
+			int sizeOfList = 120000;
+			Random rnd = new Random();
+			List<User> users = new ArrayList<>();
+			for(int i = 113989; i < sizeOfList; i++) {
+				System.out.println("Inicia " + i);
+				String nombre = "";
+				for(int j = 0; j < 7; j++) {
+					nombre += (char)(rnd.nextInt(91) + 65);
+				}
+				System.out.println("Inicia " + nombre);
+				User user = new User(new Long(i), nombre, true, LocalDate.of(2020, 1, 7));
+				UserCredential userCredential = new UserCredential(new Long(i), nombre, user);
+				
+				user.setUserCredential(userCredential);
+				//user.setProfiles(profiles);
+				System.out.println("Inicia insert " + user.toString());
+				users.add(user);
+				System.out.println("Finaliza insert " + i);
+			}
+			userRepository.insertAll(users);
+			List<User> usersPrint = print();
+			assertTrue(sizeOfList == usersPrint.size());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	private List<User> print() {
-		List<User> users = userRepository.list();
+		List<User> users = null;
+		try {
+			users = userRepository.list();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		System.out.printf("Size of the list is: %s\n", users.size());
 		return users;
 	}

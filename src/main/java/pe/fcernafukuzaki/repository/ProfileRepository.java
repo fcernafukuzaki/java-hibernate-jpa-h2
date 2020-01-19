@@ -1,32 +1,15 @@
 package pe.fcernafukuzaki.repository;
 
-import javax.persistence.EntityManager;
+import java.util.List;
 
 import pe.fcernafukuzaki.model.Profile;
 
-public class ProfileRepository {
+public interface ProfileRepository {
 
-	private EntityManager manager;
+	public Profile insert(Profile profile);
 	
-	public ProfileRepository() {
-		manager = Repository.init();
-	}
+	public List<Profile> list();
 	
-	public Profile insert(Profile profile) {
-		manager.getTransaction().begin();
-		manager.persist(profile);
-		manager.getTransaction().commit();
-		return profile;
-	}
-	
-	public Profile findById(Long uid_profile) {
-		Profile profile = manager.find(Profile.class, uid_profile);
-		if(profile != null) {
-			System.out.println("* " + profile.toString());
-		} else {
-			System.out.println("* Not found profile with uid: " + uid_profile);
-		}
-		return profile;
-	}
+	public Profile findById(Long uid_profile);
 	
 }
